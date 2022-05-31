@@ -1,0 +1,47 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eureka-server
+spec:
+  selector:
+    matchLabels:
+      app: eureka-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: eureka-server
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: eureka-server
+          image: eurekaserver:1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8081
+#          env: # Setting Environmental Variables
+#            - name: EUREKA_HOST
+#              valueFrom:
+#                configMapKeyRef:
+#                  name: config
+#                  key: eurekaHost
+#            - name: EUREKA_PORT # Setting Database password
+#              value: "8093"
+
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eureka-server-service
+spec:
+  ports:
+    - protocol: "TCP"
+      port: 8081    # The port inside the cluster
+      targetPort: 8081  # The port exposed by the service
+  type: LoadBalancer        # Type of service
+  selector:
+    app: eureka-server
+---
